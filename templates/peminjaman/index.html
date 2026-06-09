@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Peminjaman — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">Riwayat <span>Peminjaman</span></div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>#</th><th>Judul Buku</th><th>Peminjam</th><th>Tgl Pinjam</th><th>Batas</th><th>Terlambat</th><th>Denda</th><th>Status</th><th>Aksi</th></tr>
+    </thead>
+    <tbody>
+    {% for p in peminjaman %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td><b>{{ p.buku.judul }}</b></td>
+      <td>{{ p.nama_peminjam }}</td>
+      <td>{{ p.tanggal.strftime('%d %b %Y') }}</td>
+      <td>{{ p.batas_kembali.strftime('%d %b %Y') if p.batas_kembali else '—' }}</td>
+      <td>{% if p.hari_terlambat > 0 %}<span style="color:var(--accent);font-weight:800">{{ p.hari_terlambat }} hari</span>{% else %}—{% endif %}</td>
+      <td>
+        {% if p.total_denda > 0 %}
+          <span class="denda-chip {{ 'denda-lunas' if p.denda_lunas }}">{{ '✓ Lunas' if p.denda_lunas else p.total_denda | rupiah }}</span>
+          {% if not p.denda_lunas and p.status == 'Dikembalikan' %}
+          <form method="POST" action="{{ url_for('peminjaman.bayar_denda', id=p.id) }}" style="display:inline">
+            <button type="submit" class="btn btn-outline btn-sm" style="margin-left:.3rem">Bayar</button>
+          </form>
+          {% endif %}
+        {% else %}—{% endif %}
+      </td>
+      <td>
+        {% if p.status == 'Dipinjam' and p.hari_terlambat > 0 %}
+          <span class="badge badge-terlambat">⚠️ Terlambat</span>
+        {% elif p.status == 'Dipinjam' %}
+          <span class="badge badge-dipinjam">Dipinjam</span>
+        {% else %}
+          <span class="badge badge-kembali">Dikembalikan</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if p.status == 'Dipinjam' %}
+        <form method="POST" action="{{ url_for('peminjaman.kembalikan', id=p.id) }}">
+          <button type="submit" class="btn btn-outline btn-sm">Kembalikan</button>
+        </form>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9" class="empty-state">Belum ada peminjaman</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}{{ buku.judul }} — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="reader-wrap">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.8rem">
+    <a href="{{ url_for('books.index') }}" class="btn btn-outline">← Kembali</a>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('books.cerita', id=buku.id) }}" class="btn btn-outline">✍️ Edit Cerita</a>
+    {% endif %}
+  </div>
+
+  {% if buku.cover %}
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <img src="{{ url_for('cover_file', filename=buku.cover) }}" alt="{{ buku.judul }}"
+         style="max-height:280px;border-radius:16px;box-shadow:0 8px 32px rgba(132,94,194,.2)">
+  </div>
+  {% endif %}
+
+  <div class="reader-title">{{ buku.judul }}</div>
+  <div class="reader-meta">oleh {{ buku.penulis }} · {{ buku.tahun }}{% if buku.rak_nama %} · 📍 {{ buku.rak_nama }}{% endif %}</div>
+  <div style="margin-bottom:1rem"><span class="stars">{{ buku.rata_rating | stars }}</span> <span style="font-size:.83rem;color:var(--muted);font-weight:600">{{ '%.1f'|format(buku.rata_rating) + ' dari ' + ulasan|length|string + ' ulasan' if ulasan else 'Belum ada ulasan' }}</span></div>
+
+  <hr class="reader-divider">
+
+  {% if buku.cerita and buku.cerita.strip() %}
+    <div class="reader-text">{{ buku.cerita }}</div>
+  {% else %}
+    <div class="empty-cerita">
+      <div class="icon">📝</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;margin-bottom:1rem">Belum ada isi cerita.</div>
+      {% if current_user.role == 'admin' %}
+      <a href="{{ url_for('books.cerita', id=buku.id) }}" class="btn btn-purple">✍️ Tulis Sekarang</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- ULASAN -->
+  <hr class="reader-divider">
+  <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;margin-bottom:1.2rem">Ulasan Pembaca</div>
+
+  <div style="background:#F8F4FF;border:2px solid #E8D8FF;border-radius:20px;padding:1.5rem;margin-bottom:1.5rem">
+    <div style="font-weight:800;margin-bottom:1rem;color:var(--purple)">⭐ Tulis Ulasan</div>
+    <form method="POST" action="{{ url_for('books.ulasan', id=buku.id) }}">
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" name="nama" class="form-control" value="{{ current_user.nama }}" required>
+      </div>
+      <div class="form-group">
+        <label>Rating</label>
+        <input type="hidden" name="rating" id="ratingInput" value="5">
+        <div style="display:flex;gap:.3rem;margin:.4rem 0">
+          {% for i in range(1,6) %}
+          <button type="button" class="star-btn" data-val="{{ i }}"
+                  style="font-size:1.6rem;background:none;border:none;cursor:pointer;color:var(--yellow);transition:transform .1s"
+                  onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform=''">★</button>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ulasan</label>
+        <textarea name="teks" class="form-control" placeholder="Tulis ulasanmu..." rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-purple">Kirim Ulasan</button>
+    </form>
+  </div>
+
+  {% for u in ulasan %}
+  <div class="ulasan-item">
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span class="ulasan-nama">{{ u.nama }}</span>
+      <span class="stars" style="font-size:.85rem">{{ u.rating | stars }}</span>
+    </div>
+    <div class="ulasan-text">{{ u.teks }}</div>
+    <div class="ulasan-date">{{ u.created_at.strftime('%d %b %Y') }}</div>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:2rem;color:var(--muted);font-weight:600">Belum ada ulasan. Jadilah yang pertama! 😊</div>
+  {% endfor %}
+</div>
+{% endblock %}

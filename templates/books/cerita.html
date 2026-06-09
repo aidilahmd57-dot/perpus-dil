@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Cerita: {{ buku.judul }} — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">✍️ Tulis <span>Cerita</span></div>
+  <div style="display:flex;gap:.6rem">
+    <a href="{{ url_for('books.baca', id=buku.id) }}" class="btn btn-outline">👁️ Preview</a>
+    <a href="{{ url_for('books.index') }}" class="btn btn-outline">← Kembali</a>
+  </div>
+</div>
+
+<div class="form-card" style="max-width:720px">
+  <div style="margin-bottom:1rem">
+    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--purple)">{{ buku.judul }}</div>
+    <div style="font-size:.83rem;color:var(--muted)">oleh {{ buku.penulis }}</div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>Upload File .TXT (opsional — akan mengganti teks di bawah)</label>
+      <div class="cover-upload-area" onclick="document.getElementById('fileInput').click()" style="padding:1rem">
+        <div>📄 Klik untuk pilih file .TXT</div>
+      </div>
+      <input type="file" name="file_cerita" id="fileInput" accept=".txt" style="display:none"
+             onchange="document.getElementById('fileName').textContent = this.files[0]?.name || ''">
+      <div id="fileName" style="font-size:.78rem;color:var(--teal);margin-top:.4rem;font-weight:700"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Isi Cerita</label>
+      <textarea name="cerita" class="textarea-cerita" placeholder="Tulis isi cerita di sini...">{{ buku.cerita or '' }}</textarea>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:.4rem" id="wordCount"></div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('books.index') }}" class="btn btn-outline">Batal</a>
+      <button type="submit" class="btn btn-purple">💾 Simpan Cerita</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const ta = document.querySelector('.textarea-cerita');
+const wc = document.getElementById('wordCount');
+function updateWC() {
+  const t = ta.value.trim();
+  const words = t ? t.split(/\s+/).length : 0;
+  wc.textContent = words.toLocaleString('id-ID') + ' kata · ' + t.length.toLocaleString('id-ID') + ' karakter';
+}
+ta.addEventListener('input', updateWC);
+updateWC();
+</script>
+{% endblock %}

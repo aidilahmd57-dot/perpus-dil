@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Pinjam Buku — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">📋 Pinjam <span>Buku</span></div>
+  <a href="{{ url_for('books.index') }}" class="btn btn-outline">← Kembali</a>
+</div>
+
+<div class="form-card">
+  <div style="background:#F8F4FF;border:2px solid #E8D8FF;border-radius:16px;padding:1rem;margin-bottom:1.5rem">
+    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem">{{ buku.judul }}</div>
+    <div style="font-size:.83rem;color:var(--muted)">oleh {{ buku.penulis }} · Stok tersisa: <b style="color:var(--teal)">{{ buku.stok }}</b></div>
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>Nama Peminjam</label>
+      <input type="text" name="nama_peminjam" class="form-control" placeholder="Masukkan nama peminjam" required autofocus>
+    </div>
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">
+      📅 Batas kembali: <b>7 hari</b> dari hari ini · Denda: <b>Rp 2.000/hari</b>
+    </div>
+    <div class="form-actions">
+      <a href="{{ url_for('books.index') }}" class="btn btn-outline">Batal</a>
+      <button type="submit" class="btn btn-teal">✅ Konfirmasi Pinjam</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

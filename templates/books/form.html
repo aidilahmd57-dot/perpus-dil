@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Tambah' }} Buku — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">{{ 'Edit' if mode == 'edit' else 'Tambah' }} <span>Buku</span></div>
+  <a href="{{ url_for('books.index') }}" class="btn btn-outline">← Kembali</a>
+</div>
+
+<div class="form-card" style="max-width:580px">
+  <form method="POST" enctype="multipart/form-data">
+
+    <div class="form-group">
+      <label>Judul Buku</label>
+      <input type="text" name="judul" class="form-control" placeholder="Masukkan judul buku" value="{{ buku.judul if buku else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label>Penulis</label>
+      <input type="text" name="penulis" class="form-control" placeholder="Nama penulis" value="{{ buku.penulis if buku else '' }}" required>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div class="form-group">
+        <label>Tahun Terbit</label>
+        <input type="number" name="tahun" class="form-control" placeholder="2024" value="{{ buku.tahun if buku else '' }}">
+      </div>
+      <div class="form-group">
+        <label>Stok</label>
+        <input type="number" name="stok" class="form-control" placeholder="1" min="0" value="{{ buku.stok if buku else '' }}">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Genre</label>
+      <select name="genre" class="form-control">
+        {% for g in ['Fiksi','Non-Fiksi','Sastra','Sejarah','Sains','Pengembangan Diri','Roman','Fantasi','Lainnya'] %}
+        <option value="{{ g }}" {{ 'selected' if buku and buku.genre == g }}>{{ g }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Lokasi Rak</label>
+      <select name="rak_id" class="form-control">
+        <option value="">-- Pilih Rak --</option>
+        {% for r in rak_list %}
+        <option value="{{ r.id }}" {{ 'selected' if buku and buku.rak_id == r.id }}>{{ r.nama }} — {{ r.lokasi }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Deskripsi</label>
+      <textarea name="deskripsi" class="form-control" placeholder="Deskripsi singkat buku...">{{ buku.deskripsi if buku else '' }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Cover Buku</label>
+      <div class="cover-upload-area" id="coverDropZone" onclick="document.getElementById('coverInput').click()">
+        <div>🖼️ Klik atau seret gambar ke sini</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-top:.3rem">JPG, PNG, WebP — Maks 5MB</div>
+      </div>
+      <input type="file" name="cover" id="coverInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none">
+
+      <div class="cover-preview-box" id="coverPreviewBox" style="display: {% if buku and buku.cover %}block{% else %}none{% endif %}">
+        <img id="coverPreviewImg"
+             src="{{ url_for('cover_file', filename=buku.cover) if buku and buku.cover else '' }}"
+             alt="Preview cover">
+        <div class="cover-label" id="coverPreviewLabel">{{ 'Cover saat ini' if buku and buku.cover else '' }}</div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a href="{{ url_for('books.index') }}" class="btn btn-outline">Batal</a>
+      <button type="submit" class="btn btn-purple">💾 {{ 'Simpan Perubahan' if mode == 'edit' else 'Tambah Buku' }}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

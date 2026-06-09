@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Beranda — Perpustakaan DIL{% endblock %}
+{% block content %}
+
+{% if terlambat %}
+<div class="notif-bar">
+  ⚠️ {{ terlambat|length }} peminjaman terlambat dikembalikan!
+  <a href="{{ url_for('peminjaman.index') }}">Lihat →</a>
+</div>
+{% endif %}
+
+<div class="stats-bar">
+  <div class="stat-card"><div class="stat-num">{{ total_buku }}</div><div class="stat-label">Total Judul</div></div>
+  <div class="stat-card"><div class="stat-num">{{ total_stok }}</div><div class="stat-label">Total Stok</div></div>
+  <div class="stat-card"><div class="stat-num">{{ dipinjam }}</div><div class="stat-label">Dipinjam</div></div>
+  <div class="stat-card"><div class="stat-num">{{ total_genre }}</div><div class="stat-label">Kategori</div></div>
+</div>
+
+<div class="page-header">
+  <div class="page-title">Buku <span>Terbaru</span></div>
+  <a href="{{ url_for('books.index') }}" class="btn btn-outline">Lihat Semua →</a>
+</div>
+
+<div class="books-grid">
+{% for b in buku_terbaru %}
+  <div class="book-card">
+    <div class="book-cover">
+      {% if b.cover %}
+        <img src="{{ url_for('cover_file', filename=b.cover) }}" alt="{{ b.judul }}" onerror="this.parentElement.innerHTML='📚'">
+      {% else %}📚{% endif %}
+    </div>
+    <div class="book-info">
+      <div class="book-genre">{{ b.genre }} · {{ b.tahun }}</div>
+      <div class="book-title">{{ b.judul }}</div>
+      <div class="book-author">oleh {{ b.penulis }}</div>
+      {% if b.rak_nama %}<div class="book-rak">📍 {{ b.rak_nama }}</div>{% endif %}
+      <div style="margin:.4rem 0"><span class="stars">{{ b.rata_rating | stars }}</span> <span style="font-size:.75rem;color:var(--muted)">{{ b.rata_rating if b.rata_rating > 0 else 'Belum ada ulasan' }}</span></div>
+      <div class="book-footer">
+        <span class="stok-badge {{ 'stok-ada' if b.stok > 0 else 'stok-habis' }}">{{ '✓ Stok: ' + b.stok|string if b.stok > 0 else '✗ Habis' }}</span>
+        <div class="book-actions">
+          <a href="{{ url_for('books.baca', id=b.id) }}" class="btn btn-blue btn-sm">📖 Baca</a>
+          {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('books.edit', id=b.id) }}" class="btn btn-outline btn-sm">✏️</a>
+          {% if b.stok > 0 %}
+          <a href="{{ url_for('peminjaman.pinjam', buku_id=b.id) }}" class="btn btn-teal btn-sm">Pinjam</a>
+          {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+</div>
+{% endblock %}

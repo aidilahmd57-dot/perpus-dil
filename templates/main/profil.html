@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Profil — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div style="max-width:600px;margin:0 auto">
+
+  <div class="profil-hero">
+    <div style="display:flex;gap:.5rem;position:absolute;top:1rem;right:1rem">
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);color:#fff"
+              onclick="toggleSection('editForm')">✏️ Edit</button>
+      <button class="btn btn-sm" style="background:rgba(255,107,157,.25);border:2px solid rgba(255,107,157,.5);color:#fff"
+              onclick="toggleSection('passForm')">🔑 Reset PW</button>
+    </div>
+    <div class="profil-avatar">{{ current_user.nama[:2].upper() }}</div>
+    <div class="profil-nama">{{ current_user.nama }}</div>
+    <div class="profil-email">📧 {{ current_user.email }}</div>
+    <div class="profil-email">📱 {{ current_user.hp or '—' }}</div>
+    <div class="profil-badge">{{ '👑 Administrator' if current_user.role == 'admin' else '👤 @' + current_user.username }}</div>
+  </div>
+
+  <div class="profil-stats">
+    <div class="profil-stat"><div class="profil-stat-num">{{ pinjam_aktif|length }}</div><div class="profil-stat-label">Dipinjam</div></div>
+    <div class="profil-stat"><div class="profil-stat-num">{{ total_pinjam }}</div><div class="profil-stat-label">Total Pinjam</div></div>
+    <div class="profil-stat"><div class="profil-stat-num">{{ total_ulasan }}</div><div class="profil-stat-label">Ulasan</div></div>
+  </div>
+
+  {% if pinjam_aktif %}
+  <div class="profil-card">
+    <div class="profil-card-title">📚 Buku Sedang Dipinjam</div>
+    {% for p in pinjam_aktif %}
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:.7rem 0;border-bottom:2px dashed #F0EAD6">
+      <div>
+        <div style="font-weight:800">{{ p.buku.judul }}</div>
+        <div style="font-size:.8rem;color:var(--muted)">Batas: {{ p.batas_kembali.strftime('%d %b %Y') if p.batas_kembali else '—' }}</div>
+      </div>
+      <span class="stok-badge stok-ada">Aktif</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Edit Profil -->
+  <div class="profil-card" id="editForm" style="display:none">
+    <div class="profil-card-title">✏️ Edit Profil</div>
+    <form method="POST">
+      <input type="hidden" name="action" value="edit_profil">
+      <div class="form-group"><label>Nama Lengkap</label><input type="text" name="nama" class="form-control" value="{{ current_user.nama }}"></div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" class="form-control" value="{{ current_user.email }}"></div>
+      <div class="form-group"><label>No. HP</label><input type="text" name="hp" class="form-control" value="{{ current_user.hp or '' }}"></div>
+      {% if current_user.role != 'admin' %}
+      <div class="form-group"><label>Username</label><input type="text" name="username" class="form-control" value="{{ current_user.username }}"></div>
+      {% endif %}
+      <div class="form-actions"><button type="submit" class="btn btn-purple">💾 Simpan</button></div>
+    </form>
+  </div>
+
+  <!-- Ganti Password -->
+  <div class="profil-card" id="passForm" style="display:none">
+    <div class="profil-card-title" style="color:var(--pink)">🔑 Ganti Password</div>
+    <form method="POST">
+      <input type="hidden" name="action" value="ganti_password">
+      {% if current_user.role != 'admin' %}
+      <div class="form-group"><label>Password Lama</label><input type="password" name="password_lama" class="form-control" placeholder="Password saat ini..."></div>
+      {% endif %}
+      <div class="form-group"><label>Password Baru</label><input type="password" name="password_baru" class="form-control" placeholder="Minimal 6 karakter..."></div>
+      <div class="form-group"><label>Konfirmasi</label><input type="password" name="password_baru2" class="form-control" placeholder="Ulangi password baru..."></div>
+      <div class="form-actions"><button type="submit" class="btn btn-purple" style="background:var(--pink)">🔑 Simpan Password</button></div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+</script>
+{% endblock %}

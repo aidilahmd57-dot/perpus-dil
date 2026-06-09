@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Users — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">👥 User <span>Terdaftar</span></div>
+  <span style="font-size:.85rem;color:var(--muted);font-weight:700">{{ users|length }} pengguna</span>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr><th>#</th><th>Nama</th><th>Email</th><th>Username</th><th>No. HP</th><th>Role</th><th>Bergabung</th></tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.6rem">
+          <div style="width:34px;height:34px;border-radius:50%;background:{{ ['#845EC2','#FF6B9D','#06D6A0','#FF9A3C','#4FC3F7'][loop.index0 % 5] }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;flex-shrink:0">{{ u.nama[:2].upper() }}</div>
+          <b>{{ u.nama }}</b>
+        </div>
+      </td>
+      <td>{{ u.email }}</td>
+      <td>@{{ u.username }}</td>
+      <td>{{ u.hp or '—' }}</td>
+      <td><span class="badge {{ 'role-admin' if u.role == 'admin' else 'role-pengunjung' }}">{{ '👑 Admin' if u.role == 'admin' else '👤 Pengunjung' }}</span></td>
+      <td style="color:var(--muted);font-size:.83rem">{{ u.created_at.strftime('%d %b %Y') }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="empty-state">Belum ada user terdaftar</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

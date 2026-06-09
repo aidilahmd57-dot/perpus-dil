@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Perpustakaan DIL</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">PERPUSTAKAAN <span>DIL</span></div>
+    <div class="auth-sub">Sistem Perpustakaan Digital</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <div style="background:{% if category=='error' %}#FFE8E8{% else %}#E0F9F1{% endif %};border:2px solid {% if category=='error' %}rgba(255,94,94,.4){% else %}rgba(6,214,160,.4){% endif %};color:{% if category=='error' %}#FF5E5E{% else %}#05a87c{% endif %};border-radius:12px;padding:.7rem 1rem;font-size:.85rem;margin-bottom:1rem;font-weight:700;">
+        {{ message }}
+      </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+      <div class="form-group">
+        <label>Username / Email</label>
+        <input type="text" name="username" class="form-control" placeholder="username atau email..." required autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Password..." required>
+      </div>
+      <button type="submit" class="btn btn-purple" style="width:100%;margin-top:.5rem;justify-content:center;">🔐 Login</button>
+    </form>
+
+    <div class="auth-link" style="margin-top:1rem">
+      Belum punya akun? <a href="{{ url_for('auth.register') }}">Daftar sekarang</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

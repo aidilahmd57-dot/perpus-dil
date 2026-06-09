@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Perpustakaan DIL{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<header>
+  <div class="logo">PERPUSTAKAAN <span>DIL</span></div>
+  <nav>
+    <a href="{{ url_for('main.index') }}"        class="nav-btn {% if request.endpoint == 'main.index' %}active{% endif %}">📚 Beranda</a>
+    <a href="{{ url_for('books.index') }}"        class="nav-btn {% if request.blueprint == 'books' %}active{% endif %}">📖 Koleksi</a>
+    <a href="{{ url_for('main.rak') }}"           class="nav-btn {% if request.endpoint == 'main.rak' %}active{% endif %}">🗂️ Rak Buku</a>
+    {% if current_user.role == 'admin' %}
+    <a href="{{ url_for('peminjaman.index') }}"   class="nav-btn {% if request.blueprint == 'peminjaman' %}active{% endif %}">📋 Peminjaman</a>
+    <a href="{{ url_for('main.users') }}"         class="nav-btn {% if request.endpoint == 'main.users' %}active{% endif %}">👥 Users</a>
+    <a href="{{ url_for('books.tambah') }}"       class="nav-btn {% if request.endpoint == 'books.tambah' %}active{% endif %}">＋ Tambah Buku</a>
+    {% endif %}
+    <a href="{{ url_for('main.profil') }}"        class="nav-btn {% if request.endpoint == 'main.profil' %}active{% endif %}">👤 Profil</a>
+    <span class="nav-divider"></span>
+    <span class="role-badge role-{{ current_user.role }}">
+      {{ '👑 Admin' if current_user.role == 'admin' else '👤 ' + current_user.nama }}
+    </span>
+    <a href="{{ url_for('auth.logout') }}" class="nav-btn btn-logout">Logout</a>
+  </nav>
+</header>
+{% endif %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for category, message in messages %}
+    <div class="flash flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<div class="{% if current_user.is_authenticated %}main-wrap{% endif %}">
+  {% block content %}{% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

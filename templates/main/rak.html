@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Rak Buku — Perpustakaan DIL{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="page-title">🗂️ Lokasi <span>Rak Buku</span></div>
+  {% if current_user.role == 'admin' %}
+  <button class="btn btn-purple" onclick="document.getElementById('formRak').style.display=document.getElementById('formRak').style.display==='none'?'block':'none'">➕ Tambah Rak</button>
+  {% endif %}
+</div>
+
+{% if current_user.role == 'admin' %}
+<div id="formRak" style="display:none;margin-bottom:1.5rem">
+  <div class="form-card">
+    <div style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--purple);margin-bottom:1rem">Tambah Rak Baru</div>
+    <form method="POST" action="{{ url_for('main.tambah_rak') }}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="form-group"><label>Nama Rak</label><input type="text" name="nama" class="form-control" placeholder="mis: Rak A1" required></div>
+        <div class="form-group"><label>Lokasi / Lantai</label><input type="text" name="lokasi" class="form-control" placeholder="mis: Lantai 1, Sayap Kiri"></div>
+        <div class="form-group"><label>Kategori Buku</label><input type="text" name="kategori" class="form-control" placeholder="mis: Fiksi, Sastra"></div>
+        <div class="form-group"><label>Kapasitas</label><input type="number" name="kapasitas" class="form-control" placeholder="50"></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="btn btn-purple">💾 Simpan Rak</button></div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<div class="rak-grid">
+{% for r in rak_list %}
+  <div class="rak-card">
+    <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem">
+      <div class="rak-icon" style="background:{{ r.warna }}22;color:{{ r.warna }}">🗂️</div>
+      <div>
+        <div class="rak-nama">{{ r.nama }}</div>
+        <div class="rak-lokasi">📍 {{ r.lokasi }}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:1rem;margin-bottom:.6rem">
+      <div style="font-size:.8rem;color:var(--muted);font-weight:700">📦 Kapasitas: <b style="color:{{ r.warna }}">{{ r.kapasitas }}</b></div>
+      <div style="font-size:.8rem;color:var(--muted);font-weight:700">📚 Terisi: <b style="color:{{ r.warna }}">{{ r.buku|length }}</b></div>
+    </div>
+    <div style="font-size:.77rem;color:var(--muted);margin-bottom:.6rem;font-weight:700">{{ r.kategori }}</div>
+    {% if r.buku %}
+    <div>{% for b in r.buku %}<span class="book-chip">📖 {{ b.judul }}</span>{% endfor %}</div>
+    {% else %}
+    <div style="font-size:.78rem;color:var(--muted);font-style:italic">Belum ada buku di rak ini</div>
+    {% endif %}
+  </div>
+{% else %}
+<div class="empty-state">Belum ada rak buku.</div>
+{% endfor %}
+</div>
+{% endblock %}
