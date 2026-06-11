@@ -99,6 +99,7 @@ def _seed_data():
 
     db.session.commit()
 
-    app = create_app()
+app = create_app()
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
