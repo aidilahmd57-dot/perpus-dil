@@ -42,12 +42,17 @@
         <span class="stok-badge {{ 'stok-ada' if b.stok > 0 else 'stok-habis' }}">{{ '✓ Stok: ' + b.stok|string if b.stok > 0 else '✗ Habis' }}</span>
         <div class="book-actions">
           <a href="{{ url_for('books.baca', id=b.id) }}" class="btn btn-blue btn-sm">📖 Baca</a>
+        
+          {% if b.stok > 0 %}
+          <a href="{{ url_for('peminjaman.pinjam', buku_id=b.id) }}" class="btn btn-teal btn-sm">
+            📚 Pinjam
+          </a>
+          {% endif %}
+        
           {% if current_user.role == 'admin' %}
           <a href="{{ url_for('books.cerita', id=b.id) }}" class="btn btn-outline btn-sm">✍️</a>
           <a href="{{ url_for('books.edit', id=b.id) }}" class="btn btn-outline btn-sm">✏️</a>
-          {% if b.stok > 0 %}
-          <a href="{{ url_for('peminjaman.pinjam', buku_id=b.id) }}" class="btn btn-teal btn-sm">Pinjam</a>
-          {% endif %}
+        
           <form method="POST" action="{{ url_for('books.hapus', id=b.id) }}" style="display:inline">
             <button type="submit" class="btn btn-danger btn-sm confirm-delete">Hapus</button>
           </form>
